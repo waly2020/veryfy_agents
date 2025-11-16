@@ -1,0 +1,119 @@
+<section class="space-y-6 px-4 pb-24 pt-6">
+  <header class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-[color:var(--color-veryfy-blue)]">Nouvelle entreprise</h1>
+      <p class="mt-1 text-sm text-slate-500">Créer une entreprise.</p>
+    </div>
+    <a routerLink="/entreprises" class="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+      Annuler
+    </a>
+  </header>
+
+  <form [formGroup]="form" class="space-y-4 rounded-3xl bg-white p-5 shadow-sm shadow-slate-200/60" (ngSubmit)="submit()">
+    <div class="grid gap-3 sm:grid-cols-2">
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        Nom
+        <input formControlName="nom" type="text" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('nom')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        Email
+        <input formControlName="email" type="email" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('email')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        Mot de passe
+        <input formControlName="password" type="password" autocomplete="new-password" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('password')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        Confirmation
+        <input formControlName="password_confirmation" type="password" autocomplete="new-password" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('password_confirmation')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        Téléphone
+        <input formControlName="telephone" type="text" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('telephone')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        Adresse
+        <input formControlName="adresse" type="text" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('adresse')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        Ville
+        <input formControlName="ville" type="text" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('ville')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        Secteur d'activité
+        <input formControlName="secteur_activite" type="text" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('secteur_activite')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        RCCM
+        <input formControlName="rccm" type="text" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('rccm')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+        NIF
+        <input formControlName="nif" type="text" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('nif')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600 sm:col-span-2">
+        Description
+        <textarea formControlName="description" rows="3" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30"></textarea>
+        <div *ngFor="let err of getFieldErrors('description')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+      <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600 sm:col-span-2">
+        Site web
+        <input formControlName="site_web" type="url" class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30" />
+        <div *ngFor="let err of getFieldErrors('site_web')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+      </label>
+
+      <div class="sm:col-span-2 grid gap-3 sm:grid-cols-2">
+        <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          Zones géographiques (appuyez Entrée pour ajouter)
+          <input
+            type="text"
+            #zoneInput
+            (keydown.enter)="$event.preventDefault(); addZone(zoneInput.value); zoneInput.value='';"
+            class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30"
+          />
+        </label>
+        <label class="flex flex-col gap-1 text-xs font-semibold text-slate-600">
+          Types de documents (ex: rccm, nif, certificat) — Entrée pour ajouter
+          <input
+            type="text"
+            #docTypeInput
+            (keydown.enter)="$event.preventDefault(); addDocType(docTypeInput.value); docTypeInput.value='';"
+            class="rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/30"
+          />
+        </label>
+      </div>
+      <div class="sm:col-span-2">
+        <label class="flex flex-col gap-2 text-xs font-semibold text-slate-600">
+          Documents (min 1)
+          <input type="file" multiple (change)="onFilesSelected($event)" />
+          <div *ngFor="let err of getFieldErrors('documents')" class="mt-1 text-[11px] text-rose-600">{{ err }}</div>
+        </label>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+      {{ errorMessage }}
+    </div>
+
+    <button
+      type="submit"
+      (click)="submit()"
+      class="w-full rounded-full bg-[color:var(--color-veryfy-blue)] px-5 py-4 text-xs font-semibold uppercase tracking-wide text-white shadow-sm shadow-[color:var(--color-veryfy-blue)]/30 cursor-pointer"
+    >
+      Créer l’entreprise
+    </button>
+  </form>
+</section>
+
+

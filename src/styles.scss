@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+@use "tailwindcss";
+
+@layer base {
+  :root {
+    --color-veryfy-blue: #0b1f3a;
+    --color-veryfy-blue-deep: #07101e;
+    --color-veryfy-red: #c7182a;
+    --color-veryfy-cream: #f7f4ef;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--color-veryfy-cream);
+    color: #0f172a;
+  }
+
+  .dark {
+    --color-veryfy-background: var(--color-veryfy-blue-deep);
+    --color-veryfy-surface: #0f223f;
+  }
+}

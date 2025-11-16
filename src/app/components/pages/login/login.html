@@ -1,0 +1,91 @@
+<section class="flex min-h-screen flex-col justify-center bg-[color:var(--color-veryfy-cream)] px-5 py-10">
+  <div class="mx-auto w-full max-w-md space-y-6">
+    <div class="text-center">
+      <img src="/icons/icon-128x128.png" alt="Veryfy" class="mx-auto h-16 w-16" />
+      <h1 class="mt-4 text-3xl font-semibold text-[color:var(--color-veryfy-blue)]">
+        Connexion agent
+      </h1>
+      <p class="mt-2 text-sm text-slate-500">
+        Accéder à l’écosystème Veryfy pour superviser vos interventions.
+      </p>
+    </div>
+
+    <form
+      class="space-y-5 rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/60"
+      (ngSubmit)="handleSubmit()"
+      novalidate
+    >
+      <div class="space-y-2">
+        <label for="email" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Email professionnel
+        </label>
+        <input
+          id="email"
+          name="email"
+          [(ngModel)]="credentials.email"
+          type="email"
+          autocomplete="email"
+          placeholder="prenom.nom@veryfy.com"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-[color:var(--color-veryfy-blue)] focus:bg-white focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/40"
+        />
+      </div>
+
+      <div class="space-y-2">
+        <label for="password" class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Mot de passe
+        </label>
+        <div class="relative">
+          <input
+            id="password"
+            name="password"
+            [(ngModel)]="credentials.password"
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-[color:var(--color-veryfy-blue)] focus:bg-white focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/40"
+          />
+          <button
+            type="button"
+            class="absolute inset-y-0 right-3 flex items-center text-xs font-semibold text-[color:var(--color-veryfy-blue)]"
+            (click)="togglePasswordVisibility()"
+          >
+            {{ showPassword() ? 'Masquer' : 'Afficher' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage()" class="rounded-2xl bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700">
+        {{ errorMessage() }}
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-slate-500">
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            [(ngModel)]="credentials.remember"
+            name="remember"
+            class="h-4 w-4 rounded border-slate-300 text-[color:var(--color-veryfy-blue)] focus:ring-[color:var(--color-veryfy-blue)]"
+          />
+          Se souvenir de moi
+        </label>
+        <a routerLink="/auth/reset" class="font-semibold text-[color:var(--color-veryfy-blue)]">
+          Mot de passe oublié ?
+        </a>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full rounded-2xl bg-[color:var(--color-veryfy-blue)] px-4 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-lg shadow-[color:var(--color-veryfy-blue)]/20 transition hover:bg-[color:var(--color-veryfy-blue-deep)]"
+        [class.opacity-60]="isSubmitting()"
+        [disabled]="isSubmitting()"
+      >
+        {{ isSubmitting() ? 'Connexion en cours…' : 'Se connecter' }}
+      </button>
+
+      <p class="text-center text-xs text-slate-400">
+        En vous connectant, vous acceptez les conditions d’utilisation et la politique de confidentialité Veryfy.
+      </p>
+    </form>
+
+  </div>
+</section>

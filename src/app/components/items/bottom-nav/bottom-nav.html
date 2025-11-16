@@ -1,0 +1,46 @@
+<nav
+  class="fixed bottom-0 left-0 right-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/75"
+  style="padding-bottom: max(env(safe-area-inset-bottom), 0.25rem)"
+>
+  <ul class="mx-auto flex max-w-xl items-center justify-between px-4">
+    <li *ngFor="let item of items">
+      <a
+        [routerLink]="item.path"
+        routerLinkActive
+        #rla="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+        class="relative flex flex-col items-center gap-1 py-3 text-xs font-semibold uppercase tracking-tight transition-colors duration-200"
+        [class.text-[color:var(--color-veryfy-blue)]]="rla.isActive"
+        [class.text-slate-500]="!rla.isActive"
+      >
+        <span
+          [ngSwitch]="item.icon"
+          class="flex h-6 w-6 items-center justify-center"
+          [class.text-[color:var(--color-veryfy-blue)]]="rla.isActive"
+          [class.text-slate-500]="!rla.isActive"
+        >
+          <svg *ngSwitchCase="'home'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+            <path d="M12 3.172 3 10.5V21h6v-5h6v5h6V10.5l-9-7.328Z" />
+          </svg>
+          <svg *ngSwitchCase="'tasks'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+            <path d="M9 11.5 11.086 14 15 9.5l1.414 1.414L11.086 17 7.586 13.5 9 11.5Zm11-7.5v18H4V4h4.586L11 1.586A2 2 0 0 1 12.414 1h3.172a2 2 0 0 1 1.414.586L19.414 4H22Z" />
+          </svg>
+          <svg *ngSwitchCase="'clients'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+            <path d="M9 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm6.2-4A3.8 3.8 0 1 0 21 10.8 3.8 3.8 0 0 0 15.2 7ZM9 13c-3.315 0-6 2.239-6 5v2h12v-2c0-2.761-2.685-5-6-5Zm6.2 2.2c-1.227 0-2.353.324-3.24.873A4.953 4.953 0 0 1 14 20v.8h6.4V20c0-2.653-2.373-4.8-5.2-4.8Z" />
+          </svg>
+          <svg *ngSwitchCase="'companies'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+            <path d="M3 21V9l9-7 9 7v12h-7v-6h-4v6Zm2-2h3v-6h8v6h3V10.157L12 4.197l-7 5.96Z" />
+          </svg>
+          <svg *ngSwitchCase="'profile'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-3.314 0-6 2.238-6 5v1h12v-1c0-2.762-2.686-5-6-5Z" />
+          </svg>
+        </span>
+        <span>{{ item.label }}</span>
+        <span
+          *ngIf="rla.isActive"
+          class="absolute bottom-0 left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-[color:var(--color-veryfy-red)]"
+        ></span>
+      </a>
+    </li>
+  </ul>
+</nav>

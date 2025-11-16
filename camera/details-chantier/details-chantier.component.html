@@ -1,0 +1,250 @@
+@if (chantier != null)
+{
+ <div class="fixed right-0 bottom-0 px-5 py-3 bg-white">{{chantier.step}}</div>
+ <app-modal-layout [(active)]="activeModalPhotoAvant" [title]="chantier.step == 'photos_avant' ? 'Photos avant le nettoyage' : 'Photos après le nettoyage'">
+   <form enctype="multipart/form-data" [formGroup]="formGroup" (ngSubmit)="onAddPhotos(chantier.step == 'photos_avant' ? 'photos_avant' : 'photos_apres')">
+     <div class="w-full h-[300px] bg-gray-100 flex justify-center items-center relative">
+       @if (previewUrl) {
+         <img src="{{previewUrl}}" alt="Photo capturée" class="w-full h-full object-contain">
+       } @else {
+         <video #videoElement class="w-full h-full object-contain" autoplay></video>
+       }
+       <canvas #canvasElement style="display: none;"></canvas>
+       <div class="absolute bottom-5 flex gap-2">
+         @if (!previewUrl) {
+           <button type="button" class="bg-blue-800 text-white px-3 py-2 rounded" (click)="capturePhoto()">Capturer la photo</button>
+         }
+       </div>
+     </div>
+     <div class="gap-2 mt-5">
+       <button class="block px-3 py-2 w-full rounded bg-blue-800 text-white" type="submit">Enregistré</button>
+     </div>
+   </form>
+ </app-modal-layout>
+ <!-- Le reste du HTML reste inchangé -->
+ <app-modal-layout [(active)]="activeModalSignature">
+   <app-add-signature [chantier_step]="chantier.step" [chantier_id]="chantier.id" [(requestStatus)]="requestStatus" (requestStatusChange)="controlRequestStatus($event)"/>
+ </app-modal-layout>
+ <app-modal-layout [(active)]="activeModalControls" title="Controles">
+   @if (chantier.step === "control_2")
+   {
+     <app-add-controles-micron [chantier_id]="chantier.id" [(requestStatus)]="requestStatus" (requestStatusChange)="controlRequestStatus($event)"/>
+   } @else if (chantier.step === "control_1")
+   {
+     <app-add-controles [chantier_id]="chantier.id" [(requestStatus)]="requestStatus" (requestStatusChange)="controlRequestStatus($event)"/>
+   }
+ </app-modal-layout>
+ <section>
+   <div class="w-full h-[300px]">
+     <img class="size-full object-cover" src="{{environment.PHOTO_URL + chantier.restaurant.logo}}" alt="cleaner">
+   </div>
+   <div class="px-3 pt-10">
+     <h2 class="text-3xl font-bold text-main">{{chantier.nom}}</h2>
+     <h3 class="text-button font-medium text-lg py-5">{{chantier.restaurant.nom}}</h3>
+     <ul class="flex gap-4 flex-wrap mb-5">
+       <li class="flex items-center gap-1 text-button text-xs font-medium">
+         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10.143C4 5.646 7.582 2 12 2s8 3.646 8 8.143c0 4.462-2.553 9.67-6.537 11.531a3.45 3.45 0 0 1-2.926 0C6.553 19.812 4 14.606 4 10.144Z"/><circle cx="12" cy="10" r="3"/></g></svg>
+         <span>{{chantier.restaurant.adresse}}</span>
+       </li>
+       <li class="flex items-center gap-1 text-button text-xs font-medium">
+         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="6" r="4"/><circle cx="17" cy="18" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="m15.667 18l.833 1l1.833-1.889"/><path d="M14 20.834c-.634.108-1.305.166-2 .166c-3.866 0-7-1.79-7-4s3.134-4 7-4c1.713 0 3.283.352 4.5.936"/></g></svg>
+         <span>{{chantier.manager.nom}}</span>
+       </li>
+       <li class="flex items-center gap-1 text-button text-xs font-medium">
+         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="6" r="4"/><path stroke-linecap="round" d="M18 9c1.657 0 3-1.12 3-2.5S19.657 4 18 4M6 9C4.343 9 3 7.88 3 6.5S4.343 4 6 4m11.197 11c.51.588.803 1.271.803 2c0 2.21-2.686 4-6 4s-6-1.79-6-4s2.686-4 6-4q.511 0 1 .055M20 19c1.754-.385 3-1.359 3-2.5s-1.246-2.115-3-2.5M4 19c-1.754-.385-3-1.359-3-2.5s1.246-2.115 3-2.5"/></g></svg>
+         <span>{{chantier.nettoyeurs.length}} Membres</span>
+       </li>
+       <li class="flex items-center gap-1 text-button text-xs font-medium">
+         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path stroke="currentColor" stroke-width="1.5" d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12v2c0 3.771 0 5.657-1.172 6.828S17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172S2 17.771 2 14z"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M7 4V2.5M17 4V2.5M2.5 9h19" opacity=".5"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></g></svg>
+         <span>{{dateFormater(chantier.date_intervention," ",false)}}</span>
+       </li>
+     </ul>
+     <app-section title="Interlocuteurs">
+       <ul class="flex flex-col gap-3 mb-5">
+         @for (interlocuteur of chantier.restaurant.interlocuteurs; track interlocuteur){
+           <li>
+             <span class="text-main font-medium pb-2 block">{{interlocuteur.nom}} {{interlocuteur.prenom}}</span>
+             <ul class="flex gap-4 items-center">
+               <li class="flex items-center gap-2 text-xs text-button">
+                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m10.038 5.316l.649 1.163c.585 1.05.35 2.426-.572 3.349c0 0-1.12 1.119.91 3.148c2.027 2.027 3.146.91 3.147.91c.923-.923 2.3-1.158 3.349-.573l1.163.65c1.585.884 1.772 3.106.379 4.5c-.837.836-1.863 1.488-2.996 1.53c-1.908.073-5.149-.41-8.4-3.66c-3.25-3.251-3.733-6.492-3.66-8.4c.043-1.133.694-2.159 1.53-2.996c1.394-1.393 3.616-1.206 4.5.38M13.26 1.88a.75.75 0 0 1 .861-.62c.025.005.107.02.15.03q.129.027.352.09c.297.087.712.23 1.21.458c.996.457 2.321 1.256 3.697 2.631c1.376 1.376 2.175 2.702 2.632 3.698c.228.498.37.912.457 1.21a6 6 0 0 1 .113.454l.005.031a.765.765 0 0 1-.617.878a.75.75 0 0 1-.86-.617a3 3 0 0 0-.081-.327a7.4 7.4 0 0 0-.38-1.004c-.39-.85-1.092-2.024-2.33-3.262s-2.411-1.939-3.262-2.329a7.4 7.4 0 0 0-1.003-.38a6 6 0 0 0-.318-.08a.76.76 0 0 1-.626-.861"/><path fill="currentColor" fill-rule="evenodd" d="M13.486 5.33a.75.75 0 0 1 .927-.516l-.206.721l.206-.72h.003l.003.001l.008.002l.02.006l.056.02q.067.023.177.07c.146.062.345.158.59.303c.489.29 1.157.77 1.942 1.556c.785.785 1.266 1.453 1.556 1.942c.145.245.241.444.303.59a3 3 0 0 1 .09.233l.005.02l.003.008v.003l.001.001s0 .002-.72.208l.72-.206a.75.75 0 0 1-1.439.422l-.003-.10l-.035-.088a4 4 0 0 0-.216-.417c-.223-.376-.626-.946-1.326-1.646s-1.269-1.102-1.646-1.325a4 4 0 0 0-.504-.25l-.01-.004a.75.75 0 0 1-.505-.925" clip-rule="evenodd"/></svg>
+                 <span>{{interlocuteur.telephone}}</span>
+               </li>
+               <li class="flex items-center gap-2 text-xs text-button">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24"><path fill="currentColor" d="M14.5 2h-5c-2.616 0-4.191 0-5.283.458l9.689 7.046l6.366-6.79C19.168 2 17.534 2 14.5 2m6.823 1.786l-6.216 6.63l6.18 4.855C22 14.168 22 12.534 22 9.5c0-2.982 0-4.611-.677-5.714M2 9.5c0 3.287 0 4.931.908 6.038a4 4 0 0 0 .554.554c.616.505 1.398.73 2.538.829c.608.053 1.317.07 2.157.076l.57-1.138l.045-.092c.382-.764.74-1.48 1.098-1.993c.366-.524 1.03-1.274 2.13-1.274s1.764.75 2.13 1.274c.358.513.716 1.23 1.098 1.993l.046.092l.569 1.138c.84-.006 1.55-.023 2.157-.076c.944-.082 1.642-.25 2.204-.592l-6.656-5.23l-10.587-7.7l-.053.063C2 4.57 2 6.212 2 9.5"/><path fill="currentColor" d="m15.267 19.2l-1.335-2.67C13.089 14.843 12.668 14 12 14s-1.089.843-1.932 2.53L8.733 19.2c-.512 1.024-.768 1.537-.73 1.859c.057.465.407.842.868.93c.318.062.847-.157 1.905-.595c.39-.162.587-.243.787-.284c.288-.06.586-.06.874 0c.2.041.396.122.787.284c1.058.438 1.586.657 1.905.596c.46-.09.81-.465.867-.931c.04-.323-.217-.835-.729-1.858"/></svg>
+                 <span>{{interlocuteur.email}}</span>
+               </li>
+             </ul>
+           </li>
+         }
+       </ul>
+     </app-section>
+     <app-section title="Descriptif des installations">
+       <p class="text-main">Photos avant/après :</p>
+       <p class="text-main py-5">{{chantier.description}}</p>
+     </app-section>
+     <app-section title="Photos Avant/Après">
+       <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-2 xl:gap-x-8">
+         @for (photo of chantier.photos; track $index){
+           @if (photo.type_photo == "avant"){
+             <li class="relative">
+               <div class="group overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                 <img src="{{environment.PHOTO_URL + photo.path}}" alt="" class="pointer-events-none aspect-[10/7] object-cover group-hover:opacity-75">
+               </div>
+               <span class="text-white text-xs">Photo : avant</span>
+             </li>
+           }
+           @if (photo.type_photo == "apres"){
+             <li class="relative">
+               <div class="group overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                 <img src="{{environment.PHOTO_URL + photo.path}}" alt="" class="pointer-events-none aspect-[10/7] object-cover group-hover:opacity-75">
+               </div>
+               <span class="text-white text-xs">Photo : après</span>
+             </li>
+           }
+         }
+       </ul>
+       @if (chantier.step == "photos_avant" || chantier.step == "photos_apres"){
+         <div class="flex gap-3">
+           <button (click)="toggleModalAddImageAvant()" class="bg-button flex gap-2 py-2 px-3 rounded items-center text-xs text-white">
+             <svg class="text-white size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+               <path fill="currentColor" d="M19 7V5h-2V3h2V1h2v2h2v2h-2v2zm-8 10.5q1.875 0 3.188-1.312T15.5 13t-1.312-3.187T11 8.5T7.813 9.813T6.5 13t1.313 3.188T11 17.5m0-2q-1.05 0-1.775-.725T8.5 13t.725-1.775T11 10.5t1.775.725T13.5 13t-.725 1.775T11 15.5M3 21q-.825 0-1.412-.587T1 19V7q0-.825.588-1.412T3 5h3.15L8 3h7v4h2v2h4v10q0 .825-.587 1.413T19 21z"/>
+             </svg>
+             <span>Ajouter les photos {{chantier.step == "photos_avant" ? 'avant' : 'après'}} le nettoyage</span>
+           </button>
+         </div>
+       }
+     </app-section>
+     <app-section title="Schémas">
+       <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-2 xl:gap-x-8">
+         @for (schema of chantier.schemas; track schema){
+           <li class="relative">
+             <div class="group overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+               <img src="{{environment.PHOTO_URL + schema.path}}" alt="" class="pointer-events-none aspect-[10/7] object-cover group-hover:opacity-75">
+               <button type="button" class="absolute inset-0 focus:outline-none">
+                 <span class="sr-only">View details for IMG_4985.HEIC</span>
+               </button>
+             </div>
+           </li>
+         }
+       </ul>
+     </app-section>
+     @for (control of chantier.controls; track control)
+     {
+       <app-section [title]="control.titre">
+         <ul role="list" class="divide-y divide-gray-100">
+           @for (question of parseAnswers(control.questions); track $index)
+           {
+             <li class="relative flex justify-between gap-x-6 px-2 py-3">
+               <div class="flex min-w-0 gap-x-4">
+                 <div class="min-w-0 flex-auto">
+                   <p class="text-sm/6 text-white">
+                     {{question.label}}
+                   </p>
+                 </div>
+               </div>
+               <div class="flex shrink-0 items-center gap-x-4">
+                 <div class="hidden sm:flex sm:flex-col sm:items-end text-white">
+                   {{question.answer}}
+                 </div>
+               </div>
+             </li>
+           }
+         </ul>
+       </app-section>
+     }
+     @if (chantier.step == "control_1" || chantier.step == "control_2"){
+       <div class="flex gap-3 pb-5">
+         <button (click)="onOpenModalControle()" class="bg-button flex gap-2 py-2 px-3 rounded items-center text-xs text-white">
+           <svg class="size-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+             <path fill="currentColor" d="M3.75 22q-.325 0-.537-.213T3 21.25t.213-.537t.537-.213H5.5v-.75h-.75q-.325 0-.537-.213T4 19t.213-.537t.537-.213h.75v-.75H3.75q-.325 0-.537-.213T3 16.75t.213-.537T3.75 16H6q.425 0 .713.288T7 17v1q0 .425-.288.713T6 19q.425 0 .713.288T7 20v1q0 .425-.288.713T6 22zm0-7q-.325 0-.537-.213T3 14.25v-2q0-.425.288-.712T4 11.25h1.5v-.75H3.75q-.325 0-.537-.213T3 9.75t.213-.537T3.75 9H6q.425 0 .713.288T7 10v1.75q0 .425-.288.713T6 12.75H4.5v.75h1.75q.325 0 .538.213T7 14.25t-.213.538T6.25 15zm1.5-7q-.325 0-.537-.213T4.5 7.25V3.5h-.75q-.325 0-.537-.213T3 2.75t.213-.537T3.75 2h1.5q.325 0 .538.213T6 2.75v4.5q0 .325-.213.538T5.25 8M10 19q-.425 0-.712-.288T9 18t.288-.712T10 17h10q.425 0 .713.288T21 18t-.288.713T20 19zm0-6q-.425 0-.712-.288T9 12t.288-.712T10 11h10q.425 0 .713.288T21 12t-.288.713T20 13zm0-6q-.425 0-.712-.288T9 6t.288-.712T10 5h10q.425 0 .713.288T21 6t-.288.713T20 7z"/>
+           </svg>
+           <span>Répondre aux questions de controle ({{chantier.controls.length}}/2)</span>
+         </button>
+       </div>
+     }
+     <app-section title="Signatures">
+       <ul role="list" class="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-2 xl:gap-x-8">
+         @for (photo of chantier.photos; track $index){
+           @if (photo.type_photo == "signature_chef"){
+             <li class="relative">
+               <div class="group overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                 <img src="{{environment.PHOTO_URL + photo.path}}" alt="" class="pointer-events-none aspect-[10/7] object-cover group-hover:opacity-75">
+               </div>
+               <span class="text-white text-xs">
+                 Signatures des responsables <strong>{{chantier.restaurant.nom}}</strong> après réalisation et vérification
+               </span>
+             </li>
+           }
+           @if (photo.type_photo == "signature_net"){
+             <li class="relative">
+               <div class="group overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+                 <img src="{{environment.PHOTO_URL + photo.path}}" alt="" class="pointer-events-none aspect-[10/7] object-cover group-hover:opacity-75">
+               </div>
+               <span class="text-white text-xs">
+                 Signatures des responsables des équipes après réalisation et vérification
+               </span>
+             </li>
+           }
+         }
+       </ul>
+       @if (chantier.step == "signature_chef" || chantier.step == "signature_net"){
+         <div class="flex gap-3 py-2">
+           <button (click)="onOpenModalSignature()" class="bg-button flex gap-2 py-2 px-3 rounded items-center text-xs text-white">
+             <svg class="size-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+               <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M22 12.634c-4 3.512-4.572-2.013-6.65-1.617c-2.35.447-3.85 5.428-2.35 5.428s-.5-5.945-2.5-3.89s-2.64 4.74-4.265 2.748C-1.5 5.813 5-1.15 8.163 3.457C10.165 6.373 6.5 16.977 2 22m7-1h10" color="currentColor"/>
+             </svg>
+             <span>{{chantier.step == "signature_chef" ? "Ajouter la signature du chef ce restaurant" : "Votre signature"}}</span>
+           </button>
+         </div>
+       }
+     </app-section>
+   </div>
+   <div class="h-[80px]"></div>
+   <div class="fixed bottom-0 left-0 right-0 h-[70px]">
+     <div class="h-full flex items-center px-3 justify-between max-w-page mx-auto bg-page">
+       @if (chantier.step === "en_attente" && chantier.manager.id == user.id)
+       {
+         <button (click)="updateStatus()" class="bg-button text-main px-3 py-3 w-full rounded-full">
+           Commencé
+         </button>
+       }
+       @if (chantier.step == "close"){
+         <div class="bg-button/10 text-main px-3 py-3 w-full rounded text-center">
+           Chantier terminé
+         </div>
+       }
+       @if (chantier.step != "en_attente" && chantier.step != "close") {
+         <p class="text-xs">
+           <span class="text-white">
+             @if (chantier.step == "photos_avant")
+             {
+               Ajouter quelques photos avant le nettoyage
+             } @else if (chantier.step == "photos_apres")
+             {
+               Ajouter quelques photos après le nettoyage
+             } @else if (chantier.step == "control_1")
+             {
+               Répondre aux questions de controle
+             } @else if (chantier.step == "signature_chef")
+             {
+               Demander au chef du restaurant de signé
+             } @else if (chantier.step == "signature_net")
+             {
+               Ajouter votre signature
+             }
+           </span>
+           <span class="text-orange-500"> *avant de passer à l'étape suivante</span>
+         </p>
+         <button (click)="updateStatus()" class="bg-button/50 justify-center flex rounded-full gap-2 py-2 px-3 items-center text-xs text-white">
+           <span>Etape suivante</span>
+           <svg class="size-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+             <path fill="currentColor" d="M16.175 13H5q-.425 0-.712-.288T4 12t.288-.712T5 11h11.175l-4.9-4.9q-.3-.3-.288-.7t.313-.7q.3-.275.7-.288t.7.288l6.6 6.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-6.6 6.6q-.275.275-.687.275T11.3 19.3q-.3-.3-.3-.712t.3-.713z"/>
+           </svg>
+         </button>
+       }
+     </div>
+   </div>
+ </section>
+} @else {
+ <div class="skeleton w-full h-screen rounded"></div>
+}

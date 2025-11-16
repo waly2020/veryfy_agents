@@ -1,0 +1,319 @@
+<section class="space-y-6 bg-[color:var(--color-veryfy-cream)] px-5 pb-24 pt-10">
+  <div *ngIf="errorMessage()" class="rounded-3xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+    {{ errorMessage() }}
+  </div>
+  <div *ngIf="isLoading()" class="rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-sm">
+    Chargement des détails de la tâche…
+  </div>
+  <div
+    *ngIf="!isLoading() && !errorMessage() && !tache()"
+    class="rounded-3xl border border-dashed border-slate-200 bg-white px-4 py-3 text-sm text-slate-500 shadow-sm"
+  >
+    Aucune donnée de tâche à afficher. Vérifiez l’URL ou réessayez plus tard.
+  </div>
+  <ng-container *ngIf="tache() as task">
+  <header class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <a routerLink="/interventions" class="text-xs font-semibold uppercase tracking-wide text-[color:var(--color-veryfy-blue)]">
+        ← Retour aux interventions
+      </a>
+      <h1 class="mt-2 text-3xl font-semibold text-[color:var(--color-veryfy-blue)]">
+        {{ task.titre }}
+      </h1>
+      <p class="mt-1 max-w-2xl text-sm text-slate-500">
+        {{ task.description }}
+      </p>
+      <div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
+        <span class="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-600">#{{ task.id }}</span>
+        <span
+          class="rounded-full px-3 py-1 font-semibold"
+          [ngClass]="statusBadges[task.statut].classes"
+        >
+          {{ statusBadges[task.statut].label }}
+        </span>
+        <span class="rounded-full bg-[color:var(--color-veryfy-blue)]/10 px-3 py-1 font-semibold text-[color:var(--color-veryfy-blue)]">
+          Priorité {{ task.priorite | titlecase }}
+        </span>
+      </div>
+    </div>
+    <div class="rounded-3xl bg-white p-5 text-xs text-slate-500 shadow-sm shadow-slate-200/60">
+      <p class="text-sm font-semibold text-[color:var(--color-veryfy-blue)]">Coordonnées clefs</p>
+      <div class="mt-3 space-y-2">
+        <p><span class="font-semibold text-slate-600">Client :</span> {{ task.client.nom }} · {{ task.client.contact }}</p>
+        <p><span class="font-semibold text-slate-600">Entreprise :</span> {{ task.entreprise.nom }} · {{ task.entreprise.telephone }}</p>
+        <p><span class="font-semibold text-slate-600">Localisation :</span> {{ task.adresse }}, {{ task.ville }}</p>
+        <p>
+          <span class="font-semibold text-slate-600">Planning :</span>
+          {{ task.date_debut | date: 'EEEE d MMM HH:mm' : undefined : 'fr-FR' }} →
+          {{ task.date_fin_prevue | date: 'HH:mm' : undefined : 'fr-FR' }}
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <section class="grid gap-5 lg:grid-cols-3">
+    <article class="rounded-3xl bg-white p-5 shadow-sm shadow-slate-200/60 lg:col-span-2">
+      <h2 class="text-lg font-semibold text-[color:var(--color-veryfy-blue)]">Checklists</h2>
+      <ul class="mt-4 space-y-3">
+        <li *ngFor="let item of task.checklists" class="rounded-2xl border border-slate-100 px-4 py-3">
+          <label class="flex items-start gap-3">
+            <input
+              type="checkbox"
+              class="mt-1 h-5 w-5 rounded border-2 border-[color:var(--color-veryfy-blue)] text-[color:var(--color-veryfy-blue)] accent-[color:var(--color-veryfy-blue)]"
+              [checked]="item.termine"
+              [disabled]="checklistLoading()[item.id]"
+              (change)="toggleChecklistItem(item.id, $any($event.target).checked)"
+            />
+            <div class="flex flex-1 flex-col justify-between gap-2 sm:flex-row sm:items-start">
+              <div>
+                <p
+                  class="text-sm font-semibold"
+                  [ngClass]="item.termine ? 'text-slate-400 line-through' : 'text-slate-700'"
+                >
+                  {{ item.titre }}
+                </p>
+                <p class="text-xs text-slate-500">{{ item.description }}</p>
+              </div>
+              <span
+                class="rounded-full px-3 py-1 text-[11px] font-semibold uppercase"
+                [ngClass]="item.termine ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+              >
+                {{ item.termine ? 'Complété' : 'À faire' }}
+              </span>
+            </div>
+          </label>
+        </li>
+      </ul>
+    </article>
+
+    <article class="rounded-3xl bg-white p-5 shadow-sm shadow-slate-200/60">
+      <h2 class="text-lg font-semibold text-[color:var(--color-veryfy-blue)]">Équipe mobilisée</h2>
+      <div class="mt-4 space-y-2 text-xs text-slate-500">
+        <p class="font-semibold text-slate-600">Agents Veryfy</p>
+        <ul class="space-y-1">
+          <li *ngFor="let agent of task.agents" class="flex items-center justify-between">
+            <span>{{ agent.nom }}</span>
+            <span class="rounded-full bg-[color:var(--color-veryfy-blue)]/10 px-2 py-0.5 text-[color:var(--color-veryfy-blue)]">
+              {{ agent.role }}
+            </span>
+          </li>
+        </ul>
+        <p class="mt-4 font-semibold text-slate-600">Employés entreprise</p>
+        <ul class="space-y-1">
+          <li *ngFor="let employer of task.employers" class="flex items-center justify-between">
+            <span>{{ employer.nom }}</span>
+            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-slate-600">{{ employer.poste }}</span>
+          </li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <section class="grid gap-5 lg:grid-cols-2">
+    <article class="rounded-3xl bg-white p-5 shadow-sm shadow-slate-200/60">
+      <h2 class="text-lg font-semibold text-[color:var(--color-veryfy-blue)]">Documents</h2>
+      <div class="mt-4 space-y-4 text-xs text-slate-500">
+        <ul class="space-y-3">
+          <li *ngFor="let doc of task.documents" class="rounded-2xl border border-slate-100 px-4 py-3">
+            <p class="text-sm font-semibold text-slate-700">{{ doc.description }}</p>
+            <p class="mt-1 text-[11px] uppercase tracking-wide text-slate-400">{{ doc.type_document }}</p>
+            <p class="mt-2">
+              Ajouté le {{ doc.created_at | date: 'medium' : undefined : 'fr-FR' }}
+            </p>
+            <div class="mt-3 flex flex-wrap items-center gap-3 text-xs">
+              <ng-container *ngIf="isImageDocument(doc); else downloadOnly">
+                <img
+                  [src]="doc.url"
+                  [alt]="doc.description"
+                  class="h-24 w-32 rounded-lg object-cover"
+                />
+                <a
+                  [href]="doc.url"
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-veryfy-blue)] px-3 py-1 text-[11px] font-semibold uppercase text-[color:var(--color-veryfy-blue)]"
+                >
+                  Télécharger
+                </a>
+              </ng-container>
+              <ng-template #downloadOnly>
+                <a
+                  [href]="doc.url"
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-veryfy-blue)] px-3 py-1 text-[11px] font-semibold uppercase text-[color:var(--color-veryfy-blue)]"
+                >
+                  Télécharger
+                </a>
+              </ng-template>
+            </div>
+          </li>
+        </ul>
+        <div class="rounded-2xl border-2 border-dashed border-[color:var(--color-veryfy-blue)]/40 bg-[color:var(--color-veryfy-blue)]/5 p-4">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm font-semibold text-[color:var(--color-veryfy-blue)]">Ajouter un document terrain</p>
+              <p class="text-[11px] uppercase tracking-wide text-slate-400">
+                Formats acceptés : pdf, jpg, png (max 10MB)
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                (click)="triggerCameraCapture()"
+                [disabled]="isCapturingPhoto()"
+                class="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-white shadow-sm shadow-emerald-600/40 disabled:opacity-40"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
+                  <path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 8a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm6-9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+                  <path fill-rule="evenodd" d="M12 2C7.582 2 4 5.582 4 10c0 4.418 3.582 8 8 8s8-3.582 8-8c0-4.418-3.582-8-8-8ZM6 10c0-3.314 2.686-6 6-6s6 2.686 6 6-2.686 6-6 6-6-2.686-6-6Z" clip-rule="evenodd" />
+                </svg>
+                <span *ngIf="!isCapturingPhoto()">Prendre une photo</span>
+                <span *ngIf="isCapturingPhoto()">Envoi...</span>
+              </button>
+              <label
+                class="inline-flex cursor-pointer items-center justify-center rounded-full bg-[color:var(--color-veryfy-blue)] px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-white shadow-sm shadow-[color:var(--color-veryfy-blue)]/40"
+              >
+                Choisir des fichiers
+                <input
+                  type="file"
+                  multiple
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  class="sr-only"
+                  (change)="handleDocumentChange($event)"
+                />
+              </label>
+            </div>
+          </div>
+
+          <!-- Modal Caméra -->
+          <div *ngIf="isCameraModalOpen()" class="fixed inset-0 z-50">
+            <div class="absolute inset-0 bg-black/40"></div>
+            <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center">
+              <div class="rounded-t-3xl sm:rounded-3xl bg-white shadow-xl w-full sm:max-w-[560px] overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                  <h3 class="text-sm font-semibold text-[color:var(--color-veryfy-blue)]">Caméra</h3>
+                  <button (click)="closeCameraModal()" class="rounded-full border border-slate-200 px-2 py-1 text-xs text-slate-600">Fermer</button>
+                </div>
+                <div class="p-4">
+                  <div class="relative bg-slate-100 rounded-2xl overflow-hidden">
+                    <ng-container *ngIf="!capturedPreviewUrl(); else previewTpl">
+                      <video #videoPreview class="w-full h-[320px] object-contain bg-black" autoplay playsinline></video>
+                    </ng-container>
+                    <ng-template #previewTpl>
+                      <img [src]="capturedPreviewUrl()!" alt="Prévisualisation" class="w-full h-[320px] object-contain bg-black" />
+                    </ng-template>
+                    <canvas #canvasPreview class="hidden"></canvas>
+                  </div>
+                  <div class="mt-4 flex items-center justify-between">
+                    <ng-container *ngIf="!capturedPreviewUrl(); else actionsTpl">
+                      <button type="button" (click)="captureFromCamera()" class="rounded-full bg-[color:var(--color-veryfy-blue)] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm shadow-[color:var(--color-veryfy-blue)]/30">Capturer</button>
+                      <button type="button" (click)="closeCameraModal()" class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Annuler</button>
+                    </ng-container>
+                    <ng-template #actionsTpl>
+                      <button type="button" (click)="retakePhoto()" class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Reprendre</button>
+                      <button type="button" (click)="uploadCapturedPhoto()" [disabled]="isCapturingPhoto()" class="rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm shadow-emerald-600/30 disabled:opacity-40">
+                        {{ isCapturingPhoto() ? 'Envoi…' : 'Enregistrer' }}
+                      </button>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Fin modal caméra -->
+
+          <div *ngIf="nouveauxDocuments().length" class="mt-3 space-y-3">
+            <div>
+              <p class="text-[11px] font-semibold text-slate-600">Fichiers sélectionnés :</p>
+              <ul class="mt-1 list-disc pl-5">
+                <li *ngFor="let fichier of nouveauxDocuments()">
+                  {{ fichier.name }} ({{ fichier.size / 1024 | number: '1.0-1' }} Ko)
+                </li>
+              </ul>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wide">
+              <button
+                type="button"
+                class="rounded-full bg-[color:var(--color-veryfy-blue)] px-4 py-2 text-white shadow-sm shadow-[color:var(--color-veryfy-blue)]/30 disabled:opacity-40"
+                (click)="uploadDocuments()"
+                [disabled]="!nouveauxDocuments().length || isUploadingDocuments()"
+              >
+                {{ isUploadingDocuments() ? 'Envoi en cours…' : 'Envoyer vers Veryfy' }}
+              </button>
+              <button
+                type="button"
+                class="rounded-full border border-slate-300 px-4 py-2 text-slate-500"
+                (click)="resetDocuments()"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="rounded-3xl bg-white p-5 shadow-sm shadow-slate-200/60">
+      <h2 class="text-lg font-semibold text-[color:var(--color-veryfy-blue)]">Commentaires</h2>
+      <ul class="mt-4 space-y-3">
+        <li *ngFor="let comm of task.commentaires" class="rounded-2xl border border-slate-100 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-700">{{ comm.auteur }}</p>
+            <span class="text-[11px] uppercase text-slate-400">{{ comm.role }}</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-500">{{ comm.contenu }}</p>
+          <time class="mt-2 block text-[11px] uppercase tracking-wide text-slate-400">
+            {{ comm.created_at | date: 'medium' : undefined : 'fr-FR' }}
+          </time>
+        </li>
+      </ul>
+      <form class="mt-4 space-y-3 rounded-2xl bg-slate-50 px-4 py-3">
+        <label class="flex flex-col gap-2 text-xs font-semibold text-slate-600">
+          Ajouter un commentaire
+          <textarea
+            rows="3"
+            name="commentaire"
+            placeholder="Compte rendu, instruction terrain, notes clients…"
+            class="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-[color:var(--color-veryfy-blue)] focus:ring-2 focus:ring-[color:var(--color-veryfy-blue)]/40"
+            [ngModel]="commentaireContenu()"
+            (ngModelChange)="updateCommentContent($event)"
+          ></textarea>
+        </label>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="rounded-full bg-[color:var(--color-veryfy-blue)] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm shadow-[color:var(--color-veryfy-blue)]/30"
+            (click)="submitComment()"
+            [disabled]="!commentaireContenu().trim().length || isSubmittingComment()"
+          >
+            {{ isSubmittingComment() ? 'Envoi…' : 'Publier' }}
+          </button>
+          <button
+            type="button"
+            class="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+            (click)="resetCommentForm()"
+          >
+            Annuler
+          </button>
+        </div>
+      </form>
+    </article>
+  </section>
+
+  <section class="rounded-3xl bg-white p-5 shadow-sm shadow-slate-200/60">
+    <h2 class="text-lg font-semibold text-[color:var(--color-veryfy-blue)]">Chronologie</h2>
+    <ol class="mt-4 space-y-3 border-l-2 border-slate-100 pl-4">
+      <li *ngFor="let step of task.timeline" class="relative pl-4 text-xs text-slate-500">
+        <span class="absolute -left-5 top-1 h-3 w-3 rounded-full bg-[color:var(--color-veryfy-red)]"></span>
+        <p class="text-sm font-semibold text-slate-700">{{ step.label }}</p>
+        <time class="text-[11px] uppercase tracking-wide text-slate-400">
+          {{ step.date | date: 'EEEE d MMM HH:mm' : undefined : 'fr-FR' }}
+        </time>
+      </li>
+    </ol>
+  </section>
+</ng-container>
+</section>

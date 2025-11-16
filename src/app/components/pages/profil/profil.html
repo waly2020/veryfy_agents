@@ -1,0 +1,74 @@
+<section class="space-y-6 px-4 pb-32 pt-6">
+  <header class="rounded-3xl bg-white p-6 shadow-sm">
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Profil agent</p>
+          <h1 class="text-2xl font-semibold text-[color:var(--color-veryfy-blue)]">
+            {{ agent.prenom }} {{ agent.nom }}
+          </h1>
+          <p class="text-sm text-slate-500">{{ agent.poste }}</p>
+        </div>
+        <!-- Bouton déplacé en bas -->
+      </div>
+      <dl class="grid gap-3 text-xs text-slate-500 sm:grid-cols-2">
+        <div class="flex items-center gap-2">
+          <dt class="font-semibold text-slate-600">Email</dt>
+          <dd>{{ agent.email }}</dd>
+        </div>
+        <div class="flex items-center gap-2">
+          <dt class="font-semibold text-slate-600">Téléphone</dt>
+          <dd>{{ agent.telephone }}</dd>
+        </div>
+        <div class="flex items-center gap-2">
+          <dt class="font-semibold text-slate-600">Adresse</dt>
+          <dd>{{ agent.adresse }}</dd>
+        </div>
+        <div class="flex items-center gap-2">
+          <dt class="font-semibold text-slate-600">Zones</dt>
+          <dd class="flex flex-wrap gap-1">
+            <span
+              *ngFor="let zone of agent.zones_geographiques"
+              class="rounded-full bg-[color:var(--color-veryfy-blue)]/10 px-2 py-0.5 text-[color:var(--color-veryfy-blue)]"
+            >
+              {{ zone }}
+            </span>
+          </dd>
+        </div>
+        <div class="flex items-center gap-2">
+          <dt class="font-semibold text-slate-600">Statut</dt>
+          <dd>
+            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-700">
+              {{ agent.actif ? 'Actif' : 'Inactif' }}
+            </span>
+          </dd>
+        </div>
+        <div class="flex items-center gap-2">
+          <dt class="font-semibold text-slate-600">Chez Veryfy depuis</dt>
+          <dd>{{ agent.date_embauche | date: 'longDate' : undefined : 'fr-FR' }}</dd>
+        </div>
+      </dl>
+      <div class="flex flex-wrap gap-2 text-xs text-slate-500">
+        <span
+          *ngFor="let specialite of agent.specialites"
+          class="rounded-full border border-slate-200 px-3 py-1"
+        >
+          {{ specialite }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sections retirées -->
+
+  <div class="sticky bottom-24 px-4 pb-6">
+    <button
+      type="button"
+      (click)="handleLogout()"
+      class="w-full rounded-full bg-[color:var(--color-veryfy-red)] px-4 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-lg shadow-[color:var(--color-veryfy-red)]/30 transition hover:bg-[#a31220] disabled:opacity-60"
+      [disabled]="isLoggingOut()"
+    >
+      {{ isLoggingOut() ? 'Déconnexion…' : 'Déconnexion' }}
+    </button>
+  </div>
+</section>
