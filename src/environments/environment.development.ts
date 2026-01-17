@@ -1,4 +1,4 @@
 export const environment = {
-  apiBaseUrl: 'https://veryfy.fr/api',
-  imageBaseUrl: 'https://veryfy.fr/storage',
+  apiBaseUrl: 'https://www.veryfy.fr/api',
+  imageBaseUrl: 'https://www.veryfy.fr/storage',
 };
